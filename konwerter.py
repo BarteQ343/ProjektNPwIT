@@ -1,5 +1,7 @@
 import argparse
 import json
+import yaml
+
 
 parser = argparse.ArgumentParser(description='Konwersja plików XML, JSON i YAML.')
 
@@ -23,7 +25,15 @@ if input_file_extension == 'json':
             print('Niepoprawny format pliku.', str(e))
             exit(1)
 
+if input_file_extension == 'yaml':
+    with open(args.input_file, 'r') as file:
+        try:
+            data = yaml.safe_load(file)
+        except yaml.YAMLError as e:
+            print('Niepoprawny format pliku YAML.', str(e))
+            exit(1)
 
+            
 # Funkcje zapisywania danych do nowego formatu
 
 
