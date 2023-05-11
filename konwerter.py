@@ -2,6 +2,7 @@ import argparse
 import json
 import yaml
 
+
 parser = argparse.ArgumentParser(description='Konwersja plików XML, JSON i YAML.')
 
 parser.add_argument('input_file', type=str, help='Nazwa pliku wejściowego.')
@@ -32,12 +33,14 @@ if input_file_extension == 'yaml':
             print('Niepoprawny format pliku YAML.', str(e))
             exit(1)
 
+            
 # Funkcje zapisywania danych do nowego formatu
 
 
 def same_extension():
     print("Format pliku wejściowego i wyjściowego jest taki sam! Plik niie został utworzony.")
     exit(1)
+
 
 # Wywoływanie funkcji
 
