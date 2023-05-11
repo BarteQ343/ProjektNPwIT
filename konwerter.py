@@ -6,7 +6,6 @@ parser = argparse.ArgumentParser(description='Konwersja plików XML, JSON i YAML
 parser.add_argument('input_file', type=str, help='Nazwa pliku wejściowego.')
 parser.add_argument('output_file', type=str, help='Nazwa pliku wyjściowego.')
 
-
 args = parser.parse_args()
 
 input_file_extension = args.input_file.split('.')[-1]
@@ -24,3 +23,4 @@ if input_file_extension == 'json':
         except json.JSONDecodeError as e:
             print('Niepoprawny format pliku.', str(e))
             exit(1)
+
