@@ -32,12 +32,14 @@ if input_file_extension == 'yaml':
             print('Niepoprawny format pliku YAML.', str(e))
             exit(1)
 
+
 # Funkcje zapisywania danych do nowego formatu
 
 
 def same_extension():
     print("Format pliku wejściowego i wyjściowego jest taki sam! Plik niie został utworzony.")
     exit(1)
+
 
 
 def json_to_yaml():
@@ -54,6 +56,7 @@ def yaml_to_json():
 
 if input_file_extension == output_file_extension:
     same_extension()
+
 
 if input_file_extension == 'json':
     if output_file_extension == 'yaml':
