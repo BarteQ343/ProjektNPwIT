@@ -1,8 +1,8 @@
 import argparse
 import json
 import yaml
-import xml.etree.ElementTree as ET
 import os
+import xmltodict
 
 parser = argparse.ArgumentParser(description='Konwersja plików XML, JSON i YAML.')
 
@@ -33,14 +33,16 @@ elif input_file_extension == 'yaml':
     with open(args.input_file, 'r') as file:
         try:
             data = yaml.safe_load(file)
-        except yaml.YAMLError as e:
-            print('Niepoprawny format pliku YAML.', str(e))
+
+        except Exception as e:
+            print(f'Błąd odczytu pliku XML: {e}')
             exit(1)
 
 elif input_file_extension == 'xml':
     try:
-        data = ET.parse(args.input_file).getroot()
-    except ET.ParseError as e:
+        with open(args.input_file) as xml_file:
+            data = xmltodict.parse(xml_file.read())
+    except xmltodict.ExpatError as e:
         print('Niepoprawny format pliku XML.', str(e))
         exit(1)
 else:
@@ -61,50 +63,28 @@ def yaml_to_json():
         json.dump(data, file)
 
 def json_to_xml():
-    root = ET.Element('root')
-    for key in data:
-        node = ET.SubElement(root, key)
-        node.text = str(data[key])
-    tree = ET.ElementTree(root)
-    tree.write(args.output_file, encoding='UTF-8', xml_declaration=True)
+    xml_file = open(args.output_file, "w")
+    xmltodict.unparse(data, output=xml_file, pretty=True)
+    xml_file.close()
 
 def yaml_to_xml():
-    root = ET.Element('root')
-    for key, value in data.items():
-        node = ET.SubElement(root, key)
-        if isinstance(value, dict):
-            for subkey, subvalue in value.items():
-                subnode = ET.SubElement(node, subkey)
-                subnode.text = str(subvalue)
-        else:
-            node.text = str(value)
-    tree = ET.ElementTree(root)
-    tree.write(args.output_file, encoding='UTF-8', xml_declaration=True)
+    xml_file = open(args.output_file, "w")
+    xmltodict.unparse(data, output=xml_file, pretty=True)
+    xml_file.close()
 
 def xml_to_json():
-    data_dict = {}
-    for elem in data:
-        if list(elem):
-            data_dict[elem.tag] = elem.attrib
-            for subelem in elem:
-                data_dict[elem.tag][subelem.tag] = subelem.text
-        elif elem.text:
-            data_dict[elem.tag] = elem.text
-    with open(args.output_file, 'w') as file:
-        json.dump(data_dict, file)
+    json_data = json.dumps(data, indent=4)
+
+    with open(args.output_file, "w") as json_file:
+        json_file.write(json_data)
+        json_file.close()
 
 def xml_to_yaml():
-    data_dict = {}
-    for elem in data:
-        if list(elem):
-            elem_dict = {}
-            for subelem in elem:
-                elem_dict[subelem.tag] = subelem.text
-            data_dict[elem.tag] = elem_dict
-        elif elem.text:
-            data_dict[elem.tag] = elem.text
-    with open(args.output_file, 'w') as file:
-        yaml.dump(data_dict, file)
+    yaml_data = yaml.dump(data, indent=4)
+
+    with open(args.output_file, "w") as yaml_file:
+        yaml_file.write(yaml_data)
+        yaml_file.close()
 
 # Wywoływanie funkcji
 
