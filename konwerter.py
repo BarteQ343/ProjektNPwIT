@@ -1,8 +1,8 @@
 import argparse
 import json
 import yaml
-import xml.etree.ElementTree as ET
 import os
+import xmltodict
 
 parser = argparse.ArgumentParser(description='Konwersja plików XML, JSON i YAML.')
 
@@ -33,14 +33,16 @@ elif input_file_extension == 'yaml':
     with open(args.input_file, 'r') as file:
         try:
             data = yaml.safe_load(file)
-        except yaml.YAMLError as e:
-            print('Niepoprawny format pliku YAML.', str(e))
+
+        except Exception as e:
+            print(f'Błąd odczytu pliku XML: {e}')
             exit(1)
 
 elif input_file_extension == 'xml':
     try:
-        data = ET.parse(args.input_file).getroot()
-    except ET.ParseError as e:
+        with open(args.input_file) as xml_file:
+            data = xmltodict.parse(xml_file.read())
+    except xmltodict.ExpatError as e:
         print('Niepoprawny format pliku XML.', str(e))
         exit(1)
 else:
@@ -59,6 +61,8 @@ def json_to_yaml():
 def yaml_to_json():
     with open(args.output_file, 'w') as file:
         json.dump(data, file)
+
+
 # Wywoływanie funkcji
 
 if input_file_extension == output_file_extension:
