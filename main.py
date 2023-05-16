@@ -4,6 +4,8 @@ import os
 import sys
 import json
 import yaml
+import xmltodict
+import threading
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -176,6 +178,45 @@ class Window(QMainWindow):
                 self.checkBoxYML.setEnabled(False)
 
     def Convert(self):
+
+        def conv_to_xml():
+            outputFile = self.file.split('/')[-1]
+            outputPath = fileDir+'\\'+outputFile.split('.')[0]+'.xml'
+            if fileExtension == 'yml' or fileExtension == 'yaml':
+                xml_file = open(outputPath, "w")
+                xmltodict.unparse(data, output=xml_file, pretty=True)
+                xml_file.close()
+            elif fileExtension == 'json':
+                    xml_file = open(outputPath, "w")
+                    xmltodict.unparse(data, output=xml_file, pretty=True)
+                    xml_file.close()
+
+        def conv_to_yaml():
+            outputFile = self.file.split('/')[-1]
+            outputPath = fileDir+'\\'+outputFile.split('.')[0]+'.yaml'
+            if fileExtension == 'json':
+                with open(outputPath, 'w') as file:
+                    yaml.dump(data, file, indent=4)
+                    file.close()
+            elif fileExtension == 'xml':
+                yaml_data = yaml.dump(data, indent=4)
+                with open(outputPath, "w") as yaml_file:
+                    yaml_file.write(yaml_data)
+                    yaml_file.close()
+
+        def conv_to_json():
+            outputFile = self.file.split('/')[-1]
+            outputPath = fileDir+'\\'+outputFile.split('.')[0]+'.json'
+            if fileExtension == 'yml' or fileExtension == 'yaml':
+                    with open(outputPath, 'w') as file:
+                        json.dump(data, file, indent=4)
+                        file.close()
+            elif fileExtension == 'xml':
+                json_data = json.dumps(data, indent=4)
+                with open(outputPath, "w") as json_file:
+                    json_file.write(json_data)
+                    json_file.close()
+
         if hasattr(self, 'file'):
             file = self.file
             fileExtension = self.fileExtension
@@ -194,32 +235,34 @@ class Window(QMainWindow):
                     try:
                         data = yaml.safe_load(file)
                     except yaml.YAMLError as e:
-                        print('Plik uszkodzony.', str(e))
+                        self.small_label3.setText('Plik uszkodzony.', str(e))
+            if fileExtension == 'xml':
+                try:
+                    with open(file) as xml_file:
+                        data = xmltodict.parse(xml_file.read())
+                except xmltodict.ExpatError as e:
+                    self.small_label3.setText('Plik uszkodzony.', str(e))
             if self.checkBoxJSON.isChecked() == False and self.checkBoxXML.isChecked() == False and self.checkBoxYML.isChecked() == False:
                 self.small_label3.setText("Wybierz na co przekonwertować plik!")
             else:
                 if self.checkBoxXML.isChecked():
-                    self.small_label3.setText("XML_True")
+                    xmlTH = threading.Thread(target=conv_to_xml)
+                    xmlTH.start()
+                    self.small_label3.setText("Konwersja na plik XML ukończona")
                 else:
                     print("XML_False")
                 if self.checkBoxYML.isChecked():
-                    outputFile = self.file.split('/')[-1]
-                    outputPath = fileDir+'\\'+outputFile.split('.')[0]+'.yaml'
-                    if fileExtension == 'json':
-                        with open(outputPath, 'w') as file:
-                            yaml.dump(data, file, indent=4)
-                    if self.small_label3.text() == "XML_True":
+                    yamlTH = threading.Thread(target=conv_to_yaml)
+                    yamlTH.start()
+                    if self.small_label3.text() == "Konwersja na plik XML ukończona":
                         self.small_label4.setText("Konwersja na plik YAML ukończona")
                     else:
                         self.small_label3.setText("Konwersja na plik YAML ukończona")
                 else:
                     print("YML_False")
                 if self.checkBoxJSON.isChecked():
-                    outputFile = self.file.split('/')[-1]
-                    outputPath = fileDir+'\\'+outputFile.split('.')[0]+'.json'
-                    if fileExtension == 'yml' or fileExtension == 'yaml':
-                            with open(outputPath, 'w') as file:
-                                json.dump(data, file, indent=4)
+                    jsonTH = threading.Thread(target=conv_to_json)
+                    jsonTH.start()
                     if self.small_label3.text() == "":
                         self.small_label3.setText("Konwersja na plik JSON ukończona")
                     else:
