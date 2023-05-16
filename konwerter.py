@@ -29,6 +29,7 @@ if input_file_extension == 'json':
             print('Niepoprawny format pliku.', str(e))
             exit(1)
 
+
 elif input_file_extension == 'yaml':
     with open(args.input_file, 'r') as file:
         try:
@@ -54,6 +55,22 @@ def same_extension():
     print("Format pliku wejściowego i wyjściowego jest taki sam! Plik nie został utworzony.")
     exit(1)
 
+if input_file_extension == 'yaml':
+    with open(args.input_file, 'r') as file:
+        try:
+            data = yaml.safe_load(file)
+        except yaml.YAMLError as e:
+            print('Niepoprawny format pliku YAML.', str(e))
+            exit(1)
+
+
+# Funkcje zapisywania danych do nowego formatu
+
+
+def same_extension():
+    print("Format pliku wejściowego i wyjściowego jest taki sam! Plik niie został utworzony.")
+    exit(1)
+
 def json_to_yaml():
     with open(args.output_file, 'w') as file:
         yaml.dump(data, file)
@@ -62,13 +79,12 @@ def yaml_to_json():
     with open(args.output_file, 'w') as file:
         json.dump(data, file)
 
-
 # Wywoływanie funkcji
 
 if input_file_extension == output_file_extension:
     same_extension()
 
-elif input_file_extension == 'json':
+if input_file_extension == 'json':
     if output_file_extension == 'yaml':
         print("Konwertowanie pliku json na yaml...")
         json_to_yaml()
@@ -77,7 +93,7 @@ elif input_file_extension == 'json':
         print("Konwertowanie pliku json na xml...")
         json_to_xml()
 
-elif input_file_extension == 'yaml':
+if input_file_extension == 'yaml':
     if output_file_extension == 'json':
         print("Konwertowanie pliku yaml na json...")
         yaml_to_json()

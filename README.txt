@@ -1,0 +1,1 @@
+Koniecznie uruchom installResources.bat przed pierwszym użyciem narzędzia.
