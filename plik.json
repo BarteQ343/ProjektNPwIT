@@ -1,0 +1,19 @@
+{
+    "rozklad": {
+        "linie": {
+            "linia": [
+                {
+                    "koniec": "Srokowo",
+                    "numer": "5",
+                    "poczatek": "Gorczyn"
+                },
+                {
+                    "koniec": "Putkowo",
+                    "numer": "105",
+                    "poczatek": "Rondo Rataje"
+                }
+            ]
+        },
+        "miejscowosc": "Poznan"
+    }
+}
